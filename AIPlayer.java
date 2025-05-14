@@ -1,12 +1,32 @@
+
+/**
+ * @author (Dhvani & Brianna)
+ * 
+ * This is the AIPlayer class that functions the movement of the CPU Player. 
+ */
 public class AIPlayer {
     private final char aiMark;
     private final char playerMark;
 
+    /**
+     * public AIPlayer
+     * 
+     * This is the constructor.
+     * 
+     * @param char mark
+     */
     public AIPlayer(char mark) {
         this.aiMark = mark;
         this.playerMark = (mark == 'X') ? 'O' : 'X';
     }
 
+    /**
+     * public void makeMove
+     * 
+     * This is where CPU will make its move during its turn.
+     * 
+     * @param Board board
+     */
     public void makeMove(Board board) {
         int[] bestMove = findBestMove(board);
         if (bestMove != null) {
@@ -14,6 +34,15 @@ public class AIPlayer {
         }
     }
 
+    /**
+     * private int[] findBestMove
+     * 
+     * This will make the CPU decision make on where to put its mark. 
+     * 
+     * @param Board board
+     * 
+     * @return winningMove, blockingMove, new int[] {1, 1}, corner, edge, null
+     */
     private int[] findBestMove(Board board) {
         // 1. Check for winning move
         int[] winningMove = findWinningMove(board, aiMark);
@@ -45,6 +74,15 @@ public class AIPlayer {
         return null;
     }
 
+    /**
+     * public int[] findWinningMove
+     * 
+     * This will make the CPU look for a move.
+     * 
+     * @param Board board, char mark
+     * 
+     * @return new int[]{row, col}, null
+     */
     private int[] findWinningMove(Board board, char mark) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {

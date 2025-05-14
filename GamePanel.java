@@ -6,6 +6,11 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
+/**
+ * @author (Dhvani & Brianna)
+ * 
+ * This is the main game panel class that operates the TicTacToe game, extending the JPanel.
+ */
 public class GamePanel extends JPanel {
     private Board board;
     private AIPlayer ai;
@@ -16,19 +21,18 @@ public class GamePanel extends JPanel {
     private BufferedImage backgroundImage;
     private Timer aiTimer;
     private String playerName = "Player";
-    private Clip xSound, oSound, winSound, drawSound;
+    private Clip xSound, oSound, winSound, drawSound, bgSound;
 
-    // Monochromatic color palette
+    // Updated Colors
     private final Color PLAYER_COLOR = new Color(255, 165, 0);    // Orange (X)
-    private final Color AI_COLOR = new Color(34, 139, 34);        // (O)
-    private final Color BACKGROUND_COLOR = new Color(20, 20, 20); // Near-Black
-    private final Color GRID_COLOR = new Color(70, 70, 70);       // Slate Gray
-    private final Color SCORE_PANEL = new Color(35, 35, 35);      // Slightly Warmer Charcoal
-    private final Color TEXT_COLOR = new Color(255, 223, 0);      // Golden Yellow
-    private final Color STATUS_COLOR = new Color(192, 192, 192);  // Silver
+    private final Color AI_COLOR = new Color(34, 139, 34);         // Green (O)
+    private final Color BACKGROUND_COLOR = new Color(20, 20, 20);  // Near-Black
+    private final Color GRID_COLOR = new Color(70, 70, 70);        // Slate Gray
+    private final Color SCORE_PANEL = new Color(35, 35, 35);       // Slightly Warmer Charcoal
+    private final Color TEXT_COLOR = new Color(255, 223, 0);       // Golden Yellow
+    private final Color STATUS_COLOR = new Color(192, 192, 192);   // Silver
 
     public GamePanel() {
-        // Get player name
         playerName = JOptionPane.showInputDialog(this, "Enter your name:", "Player Name", JOptionPane.PLAIN_MESSAGE);
         if (playerName == null || playerName.trim().isEmpty()) {
             playerName = "Player";
@@ -36,6 +40,7 @@ public class GamePanel extends JPanel {
 
         loadSounds();
         initializeGame();
+        playSound(bgSound);
     }
 
     private void loadSounds() {
@@ -44,6 +49,7 @@ public class GamePanel extends JPanel {
             oSound = loadSound("/Sound.wav");
             winSound = loadSound("/Winning.wav");
             drawSound = loadSound("/Draw.wav");
+            bgSound = loadSound("/Background.wav");
         } catch (Exception e) {
             System.out.println("Some sounds couldn't be loaded. Game will continue without them.");
         }
@@ -65,10 +71,9 @@ public class GamePanel extends JPanel {
         playerScore = 0;
         aiScore = 0;
 
-        // Initialize solid white background
         backgroundImage = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = backgroundImage.createGraphics();
-        g2d.setColor(BACKGROUND_COLOR);
+        g2d.setPaint(BACKGROUND_COLOR);
         g2d.fillRect(0, 0, 800, 800);
         g2d.dispose();
 
@@ -106,7 +111,7 @@ public class GamePanel extends JPanel {
         }
     }
 
-    private void makeAIMove() {
+    private synchronized void makeAIMove() {
         if (!playerTurn && board.checkWinner() == ' ' && !board.isFull()) {
             ai.makeMove(board);
             playSound(oSound);
@@ -177,21 +182,16 @@ public class GamePanel extends JPanel {
         int width = getWidth();
         int height = getHeight() - 50;
 
-        // Draw grid with light gray lines
         Graphics2D g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setStroke(new BasicStroke(3));
+        g2d.setStroke(new BasicStroke(5));
         g2d.setColor(GRID_COLOR);
-        
-        // Vertical lines
+
         g2d.drawLine(width/3, 0, width/3, height);
         g2d.drawLine(2*width/3, 0, 2*width/3, height);
-        
-        // Horizontal lines
         g2d.drawLine(0, height/3, width, height/3);
         g2d.drawLine(0, 2*height/3, width, 2*height/3);
 
-        // Draw X's and O's with black and gray
         int cellWidth = width / 3;
         int cellHeight = height / 3;
         for (int row = 0; row < 3; row++) {
@@ -199,7 +199,7 @@ public class GamePanel extends JPanel {
                 char cell = board.getCell(row, col);
                 int x = col * cellWidth;
                 int y = row * cellHeight;
-                
+
                 if (cell == 'X') {
                     drawX(g2d, x, y, cellWidth, cellHeight);
                 } else if (cell == 'O') {
@@ -208,23 +208,22 @@ public class GamePanel extends JPanel {
             }
         }
 
-        // Draw score panel with off-white background
         g2d.setColor(SCORE_PANEL);
         g2d.fillRect(0, height, width, 50);
-        
+
         g2d.setColor(TEXT_COLOR);
-        g2d.setFont(new Font("Arial", Font.PLAIN, 18));
+        g2d.setFont(new Font("Roboto", Font.BOLD, 20));
         g2d.drawString(playerName + " (X): " + playerScore, 20, height + 30);
         g2d.drawString("AI (O): " + aiScore, width - 150, height + 30);
-        
-        g2d.setFont(new Font("Arial", Font.BOLD, 18));
+
+        g2d.setFont(new Font("Roboto", Font.BOLD, 24));
         g2d.setColor(STATUS_COLOR);
-        g2d.drawString(statusMessage, width/2 - 80, height + 30);
+        g2d.drawString(statusMessage, width / 2 - 80, height + 30);
     }
 
     private void drawX(Graphics2D g, int x, int y, int width, int height) {
         int padding = width / 4;
-        g.setStroke(new BasicStroke(6, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setStroke(new BasicStroke(8, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.setColor(PLAYER_COLOR);
         g.drawLine(x + padding, y + padding, x + width - padding, y + height - padding);
         g.drawLine(x + padding, y + height - padding, x + width - padding, y + padding);
@@ -232,8 +231,8 @@ public class GamePanel extends JPanel {
 
     private void drawO(Graphics2D g, int x, int y, int width, int height) {
         int padding = width / 4;
-        g.setStroke(new BasicStroke(6, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setStroke(new BasicStroke(8, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.setColor(AI_COLOR);
-        g.drawOval(x + padding, y + padding, width - 2*padding, height - 2*padding);
+        g.drawOval(x + padding, y + padding, width - 2 * padding, height - 2 * padding);
     }
 }

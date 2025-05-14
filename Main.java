@@ -3,6 +3,11 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+/**
+ * @author (Dhvani & Brianna)
+ * 
+ * This is the main driver for the TicTacToe game.
+ */
 public class Main {
     private static JFrame frame;
     private static GamePanel panel;
@@ -36,6 +41,11 @@ public class Main {
         });
     }
 
+    /**
+     * private static void toggleFullScreen
+     * 
+     * This will give you the otpion to toggle full screen for you to play.
+     */
     private static void toggleFullScreen() {
         if (isFullScreen) {
             device.setFullScreenWindow(null);
